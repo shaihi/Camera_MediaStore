@@ -14,12 +14,12 @@
         android:layout_marginTop="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button"
+        app:layout_constraintTop_toBottomOf="@+id/loadButton"
         tools:srcCompat="@tools:sample/backgrounds/scenic"
-        app:layout_constraintBottom_toTopOf="@id/button"/>
+        app:layout_constraintBottom_toTopOf="@id/loadButton"/>
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/loadButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="2dp"
@@ -28,5 +28,14 @@
         app:layout_constraintBottom_toTopOf="@+id/imageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imageView"/>
+
+    <Button
+        android:id="@+id/captureBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        app:icon="@drawable/baseline_camera_alt_24"
+        app:layout_constraintBottom_toBottomOf="@id/loadButton"
+        app:layout_constraintStart_toEndOf="@id/loadButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
