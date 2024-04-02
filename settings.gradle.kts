@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LoadImage"
+rootProject.name = "Camera_MediaStore"
 include(":app")
  

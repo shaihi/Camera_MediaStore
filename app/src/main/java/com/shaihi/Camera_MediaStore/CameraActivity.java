@@ -1,4 +1,4 @@
-package com.shaihi.loadimage;
+package com.shaihi.Camera_MediaStore;
 
 import android.Manifest;
 import android.content.pm.PackageManager;

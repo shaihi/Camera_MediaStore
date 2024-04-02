@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.shaihi.loadimage"
+    namespace = "com.shaihi.Camera_MediaStore"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.shaihi.loadimage"
+        applicationId = "com.shaihi.Camera_MediaStore"
         minSdk = 30
         targetSdk = 34
         versionCode = 1
