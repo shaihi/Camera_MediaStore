@@ -2,6 +2,7 @@ package com.shaihi.loadimage;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +23,15 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
+
+import java.io.OutputStream;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -57,6 +67,10 @@ public class CameraActivity extends AppCompatActivity {
         int aspectRatio = aspectRatio(previewView.getWidth(), previewView.getHeight());
         ListenableFuture<ProcessCameraProvider> listenableFuture = ProcessCameraProvider.getInstance(this);
 
+        //ListenableFuture gives us a service to align our Activity and the camera.
+        //We register a callback to be invoked when the relevant camera functionality
+        //is complete. This allows the application to continue working while the camera
+        // is doing its work.
         listenableFuture.addListener(() -> {
             try {
                 ProcessCameraProvider cameraProvider = (ProcessCameraProvider) listenableFuture.get();
@@ -66,13 +80,20 @@ public class CameraActivity extends AppCompatActivity {
                 ImageCapture imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                         .setTargetRotation(getWindowManager().getDefaultDisplay().getRotation()).build();
 
+                //I've set here the back camera as a "hardcoded" value. It can be FRONT as well.
+                //To support both you need to set the right permissions in the manifest.
                 CameraSelector cameraSelector = new CameraSelector.Builder()
                         .requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
 
+                //while using the camera using CameraX class, we are binding (tying) camera resources
+                //to the lifecycle of the activity. With unbind we are telling it that the resources
+                //are no longer needed by our activity and so it can free them if relevant.
                 cameraProvider.unbindAll();
 
+                //Here we are binding (tying) again the resources for image capturing.
                 Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
 
+                //Regular click listener for the take snapshot button
                 capture.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -108,6 +129,7 @@ public class CameraActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(CameraActivity.this, "Image saved at: " + file.getPath(), Toast.LENGTH_SHORT).show();
+                        saveImageToMediaStore(file);
                     }
                 });
                 startCamera();
@@ -124,6 +146,32 @@ public class CameraActivity extends AppCompatActivity {
                 startCamera();
             }
         });
+    }
+
+    public void saveImageToMediaStore(File file) {
+        Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+
+        ContentResolver resolver = getContentResolver();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "Image_" + System.currentTimeMillis());
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
+
+        Uri imageUri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/");
+            imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+        } else {
+            imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+        }
+
+        try {
+            OutputStream fos = resolver.openOutputStream(imageUri);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+            fos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
