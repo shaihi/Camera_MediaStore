@@ -1,11 +1,11 @@
 package com.shaihi.loadimage;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
@@ -61,28 +61,11 @@ public class MainActivity extends AppCompatActivity {
                     // Request the Camera permission if it has not been granted. This generates a popup
                     requestPermissions(new String[]{android.Manifest.permission.CAMERA}, 0);
                 } else {
-                    Toast.makeText(MainActivity.this, "Seems we have access to the camera", Toast.LENGTH_SHORT).show();
-                    //startCamera();
+                    //Toast.makeText(MainActivity.this, "Seems we have access to the camera", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, CameraActivity.class);
+                    startActivity(intent);
                 }
             }
         });
     }
-
-    private void startCamera() {
-        // Registers a camera activity launcher.
-        ActivityResultLauncher<Void> cameraLauncher = registerForActivityResult(
-                new ActivityResultContracts.TakePicturePreview(), result -> {
-                    if (result != null) {
-                        Log.d("Camera", "Captured image: " + result);
-                        ImageView iv = findViewById(R.id.imageView);
-                        iv.setImageBitmap(result);
-                    } else {
-                        Log.d("Camera", "No image captured");
-                    }
-                });
-
-        // Launch the camera to capture an image.
-        cameraLauncher.launch(null);
-    }
-
 }
