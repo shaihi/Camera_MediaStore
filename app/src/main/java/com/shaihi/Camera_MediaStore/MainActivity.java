@@ -1,6 +1,7 @@
 package com.shaihi.Camera_MediaStore;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -30,9 +32,11 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Registers a photo picker activity launcher in single-select mode.
+
         ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
-                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+            registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri uri) {
                     // Callback is invoked after the user selects a media item or closes the
                     // photo picker.
                     if (uri != null) {
@@ -42,15 +46,20 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Log.d("PhotoPicker", "No media selected");
                     }
-                });
+                }
+            });
 
         Button loadBtn = findViewById(R.id.loadButton);
-        loadBtn.setOnClickListener(v -> {
-            // Launch the photo picker and let the user choose only images.
-            pickMedia.launch(new PickVisualMediaRequest.Builder()
-                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                    .build());
-        });
+        loadBtn.setOnClickListener(new View.OnClickListener() {
+                   @Override
+                   public void onClick(View v) {
+                        // Launch the photo picker and let the user choose only images.
+                          pickMedia.launch(new PickVisualMediaRequest.Builder()
+                                 .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                                 .build());
+                   }
+               }
+        );
 
         Button captureBtn = findViewById(R.id.captureBtn);
         captureBtn.setOnClickListener(new View.OnClickListener() {
